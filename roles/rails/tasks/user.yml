@@ -1,0 +1,21 @@
+- name: create rails user
+  user: name=rails groups=sudo shell=/bin/bash
+
+- name: configure sudo for rails user
+  lineinfile: 'dest=/etc/sudoers line="rails ALL=(ALL) NOPASSWD: ALL"'
+
+- name: create rails ssh path
+  file:
+    path: /home/rails/.ssh
+    owner: rails
+    group: rails
+    mode: 0700
+    state: directory
+
+- name: create rails deploy key
+  template:
+    src: deploy_key
+    dest: /home/rails/.ssh/deploy_key
+    owner: rails
+    group: rails
+    mode: 0600

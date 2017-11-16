@@ -1,0 +1,34 @@
+- name: add postgres apt key
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+- name: add postgres apt repository
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main
+    update_cache: yes
+
+- name: install postgres dependencies
+  apt: pkg={{ item }}
+  with_items:
+    - libxslt1.1
+    - postgresql-common
+
+- name: install postgres dependencies
+  apt: pkg={{ item }}
+  with_items:
+    - postgresql-{{ pg_version }}
+    - postgresql-contrib-{{ pg_version }}
+    - postgresql-server-dev-{{ pg_version }}
+
+- name: remove invalid PostgreSQL service
+  file: path=/lib/systemd/system/postgresql.service state=absent
+
+- name: configure postgres service
+  template:
+    src: systemd/postgresql@.service
+    dest: /lib/systemd/system/postgresql@.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable postgres service
+  systemd: name=postgresql enabled=yes daemon_reload=yes

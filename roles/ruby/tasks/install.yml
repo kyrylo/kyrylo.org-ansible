@@ -1,0 +1,32 @@
+- name: install ruby dependencies
+  apt: pkg={{item}}
+  with_items:
+    - build-essential
+    - bison
+    - zlib1g-dev
+    - libyaml-dev
+    - libssl-dev
+    - libgdbm-dev
+    - libreadline-dev
+    - libffi-dev
+
+- name: download ruby
+  get_url:
+    url: http://cache.ruby-lang.org/pub/ruby/{{ release }}/ruby-{{ ruby_version }}.tar.gz
+    dest: /tmp
+
+- name: untar ruby
+  unarchive: src=/tmp/ruby-{{ ruby_version }}.tar.gz dest=/tmp copy=no
+
+- name: build ruby
+  command: chdir=/tmp/ruby-{{ ruby_version }} {{ item }}
+  with_items:
+    - ./configure --disable-install-doc --prefix=/home/rails/.gem/ruby/{{ ruby_version }}
+    - make
+    - make install
+
+- name: cleanup ruby
+  file: path={{ item }} state=absent
+  with_items:
+    - /tmp/ruby-{{ ruby_version }}
+    - /tmp/ruby-{{ ruby_version }}.tar.gz

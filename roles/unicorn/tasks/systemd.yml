@@ -1,0 +1,20 @@
+- name: copy rails systemd service
+  template:
+    src: systemd/rails.service
+    dest:  /lib/systemd/system/rails.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: is unicorn running
+  command: cat /home/rails/shared/pids/unicorn.pid
+  register: old_unicorn
+  ignore_errors: true
+
+- name: hot restart unicorn
+  command: kill -s USR2 "{{ old_unicorn.stdout }}"
+  when: old_unicorn|success
+
+- name: start unicorns via systemd
+  systemd: name=rails.service state=started enabled=yes
+  when: old_unicorn|failed

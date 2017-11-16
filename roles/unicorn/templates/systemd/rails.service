@@ -1,0 +1,18 @@
+[Unit]
+Description=rails unicorn
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=3s
+User=rails
+Group=rails
+PIDFile=/home/rails/shared/pids/unicorn.pid
+WorkingDirectory=/home/rails/current
+ExecStart=/bin/bash -l -c "/usr/local/bin/bundle exec unicorn -c /home/rails/current/config/unicorn.conf.rb -E {{ env }}"
+ExecStop=/bin/kill -s QUIT $PIDFile
+ExecReload=/bin/kill -s HUP $PIDFile
+
+[Install]
+WantedBy=multi-user.target

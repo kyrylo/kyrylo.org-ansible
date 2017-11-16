@@ -1,0 +1,15 @@
+- name: set nginx user
+  set_fact: nginx_user=www-data
+
+- name: add nginx stable repo
+  apt_repository:
+    repo: 'ppa:nginx/stable'
+
+- name: install nginx
+  apt: name=nginx state=latest
+
+- name: disables default site
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: ensure nginx user exists
+  user: name=www-data groups=sudo

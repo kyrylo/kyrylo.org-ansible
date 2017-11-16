@@ -1,0 +1,31 @@
+- name: configure nginx paths
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    owner: www-data
+    group: www-data
+    mode: 0700
+  with_items:
+    - /etc/nginx/sites-avialable/
+    - /etc/nginx/sites-enabled/
+
+- name: install general nginx configs
+  template:
+    src: "{{ item }}"
+    dest: /etc/nginx/
+    owner: www-data
+    group: www-data
+    mode: 0600
+  with_items:
+    - nginx.conf
+    - mime.types
+
+- name: set correct nginx conf.d permissions
+  file:
+    path: /etc/nginx/conf.d/
+    state: directory
+    recurse: yes
+    owner: www-data
+    group: www-data
+    mode: 0700

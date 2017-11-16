@@ -1,0 +1,19 @@
+- name: check if the unicorn gem is installed
+  stat: path=/usr/local/bin/unicorn
+  register: unicorn_bin
+
+- name: install unicorn
+  command: "{{ item }}"
+  with_items:
+    - gem install unicorn --no-document
+  when: not unicorn_bin.stat.exists
+
+- name: deploy unicorn config
+  template:
+    src: unicorn.conf.rb
+    dest: /home/rails/current/config/unicorn.conf.rb
+    owner: rails
+    group: rails
+    mode: 0664
+
+- include_tasks: systemd.yml

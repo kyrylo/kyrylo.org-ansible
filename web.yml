@@ -1,0 +1,10 @@
+- hosts: web
+  become: true
+  vars_files: ["{{ env }}/group_vars/all", "{{ env }}/group_vars/rails"]
+
+  roles:
+    - postgres
+    - nodejs
+    - ruby
+    - rails
+    - unicorn

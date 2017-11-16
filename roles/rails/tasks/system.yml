@@ -1,0 +1,7 @@
+- name: install apt packages
+  apt: pkg={{ item }}
+  with_items:
+    - git
+
+- name: install libpq for pg gem
+  apt: pkg=libpq-dev state=present

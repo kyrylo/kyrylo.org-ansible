@@ -1,0 +1,30 @@
+- name: check if postgres is installed
+  stat: path=/var/lib/postgresql/{{ pg_version }}
+  register: pg
+
+- include_tasks: install.yml
+  when: not pg.stat.exists
+
+- name: start postgres
+  service: name=postgresql state=started enabled=yes
+
+- name: install postgresql_* playbooks dependencies
+  apt: pkg=python-psycopg2
+
+- name: create rails user
+  postgresql_user:
+    name: "{{ rails_db_user }}"
+    password: "{{ rails_db_password }}"
+    encrypted: yes
+  become_user: postgres
+
+- name: create db for rails
+  postgresql_db:
+    name: "{{ db_name }}"
+    owner: postgres
+    encoding: UTF-8
+    template: template0
+  become_user: postgres
+
+- name: reload postgres
+  service: name=postgresql state=reloaded

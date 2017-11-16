@@ -1,0 +1,33 @@
+- name: install bundler
+  command: chdir=/home/rails/current gem install bundler -v {{ bundler_version }} --no-document
+
+- name: create bundler config path
+  file:
+    path: /home/rails/current/.bundle
+    owner: rails
+    group: rails
+    mode: 0755
+    state: directory
+
+- name: configure bundler
+  template:
+    src: bundle/config
+    dest: /home/rails/current/.bundle/config
+    owner: rails
+    group: rails
+    mode: 0644
+
+- name: cache gems
+  become_user: rails
+  command: chdir=/home/rails/current bundle package --all
+
+- name: bundle install
+  become_user: rails
+  command: chdir=/home/rails/current bundle install --local --no-prune
+
+
+- name: run migrations
+  become_user: rails
+  command: bash -c "source /etc/profile.d/kyrylo.sh && bundle exec rake db:migrate"
+  args:
+    chdir: /home/rails/current

@@ -1,0 +1,6 @@
+- name: check if ruby is installed
+  stat: path=/usr/local/bin/ruby
+  register: ruby_bin
+
+- include_tasks: install.yml
+  when: not ruby_bin.stat.exists
