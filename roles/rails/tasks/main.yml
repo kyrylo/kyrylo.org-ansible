@@ -5,7 +5,7 @@
 - name: create env var export script from template
   template:
     src: environment.sh
-    dest: /etc/profile.d/kyrylo.sh
+    dest: /etc/profile.d/rails.sh
     mode: 0644
     owner: root
     group: root
