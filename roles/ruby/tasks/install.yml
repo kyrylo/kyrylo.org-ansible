@@ -21,7 +21,7 @@
 - name: build ruby
   command: chdir=/tmp/ruby-{{ ruby_version }} {{ item }}
   with_items:
-    - ./configure --disable-install-doc --prefix=/home/rails/.gem/ruby/{{ ruby_version }}
+    - ./configure --disable-install-doc
     - make
     - make install
 
