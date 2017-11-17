@@ -19,16 +19,5 @@
     - postgresql-contrib-{{ pg_version }}
     - postgresql-server-dev-{{ pg_version }}
 
-- name: remove invalid PostgreSQL service
-  file: path=/lib/systemd/system/postgresql.service state=absent
-
-- name: configure postgres service
-  template:
-    src: systemd/postgresql@.service
-    dest: /lib/systemd/system/postgresql@.service
-    owner: root
-    group: root
-    mode: 0644
-
 - name: enable postgres service
   systemd: name=postgresql enabled=yes daemon_reload=yes
