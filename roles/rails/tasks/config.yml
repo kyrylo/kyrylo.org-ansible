@@ -28,6 +28,6 @@
 
 - name: run migrations
   become_user: rails
-  command: bash -c "source /etc/profile.d/kyrylo.sh && bundle exec rake db:migrate"
+  command: bash -c "source /etc/profile.d/rails.sh && bundle exec rake db:migrate"
   args:
     chdir: /home/rails/current
