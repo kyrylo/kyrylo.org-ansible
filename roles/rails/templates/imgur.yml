@@ -1,0 +1,5 @@
+client_id: {{ imgur_client_id }}
+client_secret: {{ imgur_client_secret }}
+access_token: {{ imgur_access_token }}
+refresh_token: {{ imgur_refresh_token }}
+use_ssl: false

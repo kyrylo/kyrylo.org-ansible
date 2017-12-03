@@ -62,10 +62,28 @@
     group: rails
     mode: 0664
 
+- name: create imgur.yml
+  template:
+    src: imgur.yml
+    dest: /home/rails/shared/config/
+    owner: rails
+    group: rails
+    mode: 0664
+
 - name: link database config
   file:
     src: /home/rails/shared/config/database.yml
     dest: /var/tmp/{{ date.stdout }}/config/database.yml
+    owner: rails
+    group: rails
+    mode: 0644
+    state: link
+    force: true
+
+- name: link imgur config
+  file:
+    src: /home/rails/shared/config/imgur.yml
+    dest: /var/tmp/{{ date.stdout }}/config/imgur.yml
     owner: rails
     group: rails
     mode: 0644
