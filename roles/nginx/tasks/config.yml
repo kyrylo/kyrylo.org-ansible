@@ -3,8 +3,8 @@
     path: "{{ item }}"
     state: directory
     recurse: yes
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
     mode: 0700
   with_items:
     - /etc/nginx/sites-avialable/
@@ -14,8 +14,8 @@
   template:
     src: "{{ item }}"
     dest: /etc/nginx/
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
     mode: 0600
   with_items:
     - nginx.conf
@@ -26,6 +26,6 @@
     path: /etc/nginx/conf.d/
     state: directory
     recurse: yes
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
     mode: 0700

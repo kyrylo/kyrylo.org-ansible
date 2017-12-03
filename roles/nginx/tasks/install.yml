@@ -1,5 +1,5 @@
 - name: set nginx user
-  set_fact: nginx_user=www-data
+  set_fact: nginx_user={{ nginx_user }}
 
 - name: add nginx stable repo
   apt_repository:
@@ -12,4 +12,4 @@
   file: path=/etc/nginx/sites-enabled/default state=absent
 
 - name: ensure nginx user exists
-  user: name=www-data groups=sudo
+  user: name={{ nginx_user }} groups=sudo
