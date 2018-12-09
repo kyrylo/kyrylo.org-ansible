@@ -43,7 +43,7 @@
   git:
     repo: ssh://git@github.com/kyrylo/kyrylo.org.git
     dest: /home/rails/shared/cached_copy/
-    version: production
+    version: "{{ git_version }}"
     accept_hostkey: true
     update: yes
     force: yes
