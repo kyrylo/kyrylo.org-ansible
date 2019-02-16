@@ -19,19 +19,19 @@ worker_processes {{ ansible_processor_cores }}
 # user, do this to switch euid/egid in the workers (also chowns logs):
 # user "unprivileged_user", "unprivileged_group"
 
-app_root = "/home/rails"
+app_root = "/home/sinatra"
 shared = "#{app_root}/shared"
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
 working_directory "#{app_root}/current" # available in 0.94.0+
 
-Unicorn::HttpServer::START_CTX[0] = "/home/rails/shared/vendor/bundle/ruby/{{ ruby_stdlib_version }}/bin/unicorn"
+Unicorn::HttpServer::START_CTX[0] = "/home/unicorn/shared/vendor/bundle/ruby/{{ ruby_stdlib_version }}/bin/unicorn"
 
 # listen on both a Unix domain socket and a TCP port,
 # we use a shorter backlog for quicker failover when busy
 # listen "/path/to/.unicorn.sock", :backlog => 64
 listen "#{shared}/sockets/unicorn.sock", backlog: 64
-listen {{ rails_port }}, :tcp_nopush => true
+listen 4567, :tcp_nopush => true
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 60
@@ -60,10 +60,6 @@ GC.respond_to?(:copy_on_write_friendly=) and
 check_client_connection false
 
 before_fork do |server, worker|
-  # the following is highly recomended for Rails + "preload_app true"
-  # as there's no need for the master process to hold a connection
-  defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
-
   # The following is only recommended for memory/DB-constrained
   # installations.  It is not needed if your system can house
   # twice as many worker_processes as you have configured.
@@ -99,18 +95,6 @@ before_fork do |server, worker|
   # sleep 1
 end
 
-after_fork do |server, worker|
-  # per-process listener ports for debugging/admin/migrations
-  # addr = "127.0.0.1:#{9293 + worker.nr}"
-  # server.listen(addr, :tries => -1, :delay => 5, :tcp_nopush => true)
-
-  # the following is *required* for Rails + "preload_app true",
-  if defined?(ActiveRecord::Base)
-    ActiveRecord::Base.establish_connection
-    Rails.logger.info('Connected to ActiveRecord')
-  end
-end
-
 before_exec do |server|
-  ENV['BUNDLE_GEMFILE'] = "/home/rails/current/Gemfile"
+  ENV['BUNDLE_GEMFILE'] = "/home/sinatra/current/Gemfile"
 end

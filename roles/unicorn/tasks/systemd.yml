@@ -1,13 +1,13 @@
-- name: copy rails systemd service
+- name: copy sinatra systemd service
   template:
-    src: systemd/rails.service
-    dest:  /lib/systemd/system/rails.service
+    src: systemd/sinatra.service
+    dest: /lib/systemd/system/sinatra.service
     owner: root
     group: root
     mode: 0644
 
 - name: is unicorn running
-  command: cat /home/rails/shared/pids/unicorn.pid
+  command: cat /home/sinatra/shared/pids/unicorn.pid
   register: old_unicorn
   ignore_errors: true
 
@@ -16,5 +16,5 @@
   when: old_unicorn|success
 
 - name: start unicorns via systemd
-  systemd: name=rails.service state=started enabled=yes
+  systemd: name=sinatra.service state=started enabled=yes
   when: old_unicorn|failed

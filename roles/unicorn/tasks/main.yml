@@ -11,9 +11,9 @@
 - name: deploy unicorn config
   template:
     src: unicorn.conf.rb
-    dest: /home/rails/current/config/unicorn.conf.rb
-    owner: rails
-    group: rails
+    dest: /home/sinatra/current/unicorn.conf.rb
+    owner: sinatra
+    group: sinatra
     mode: 0664
 
 - include_tasks: systemd.yml
