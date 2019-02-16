@@ -1,0 +1,134 @@
+- name: install apt packages
+  apt: pkg={{ item }}
+  with_items:
+    - git
+
+- name: create sinatra user
+  user: name=sinatra groups=sudo shell=/bin/bash
+
+- name: configure sudo for sinatra user
+  lineinfile: 'dest=/etc/sudoers line="sinatra ALL=(ALL) NOPASSWD: ALL"'
+
+- name: create sinatra ssh path
+  file:
+    path: /home/sinatra/.ssh
+    owner: sinatra
+    group: sinatra
+    mode: 0700
+    state: directory
+
+- name: create sinatra deploy key
+  template:
+    src: deploy_key
+    dest: /home/sinatra/.ssh/deploy_key
+    owner: sinatra
+    group: sinatra
+    mode: 0600
+- name: create env var export script from template
+  template:
+    src: environment.sh
+    dest: /etc/profile.d/sinatra.sh
+    mode: 0644
+    owner: root
+    group: root
+
+- name: set kyrylo.org directory permissions
+  file:
+    path: /home/sinatra/shared/{{ item }}
+    state: directory
+    recurse: yes
+    owner: sinatra
+    group: sinatra
+    mode: 0777
+  with_items:
+    - log
+    - pids
+    - public
+    - sockets
+
+- name: set cached_copy permissions
+  file:
+    path: /home/sinatra/shared/cached_copy
+    owner: sinatra
+    group: sinatra
+    mode: 0777
+    recurse: true
+    state: directory
+
+- name: set release
+  command: /bin/date +"%Y%m%d%H%M%S"
+  register: date
+
+- name: checkout kyrylo.org code
+  git:
+    repo: ssh://git@github.com/kyrylo/kyrylo.org.git
+    dest: /home/sinatra/shared/cached_copy/
+    version: "{{ git_version }}"
+    accept_hostkey: true
+    update: yes
+    force: yes
+    key_file: /home/sinatra/.ssh/deploy_key
+
+- name: export copy of code to release
+  command: git checkout-index -f -a --prefix="/var/tmp/{{ date.stdout }}/"
+  args:
+    chdir: /home/sinatra/shared/cached_copy
+
+- name: delete git tracked log dir
+  file: path=/var/tmp/{{ date.stdout }}/log state=absent
+
+- name: link shared log directory
+  file:
+    src: /home/sinatra/shared/log
+    dest: /var/tmp/{{ date.stdout }}/log
+    state: link
+    owner: sinatra
+    group: sinatra
+    mode: 0775
+
+- name: change ownership of release
+  file:
+    path: "{{ item }}"
+    owner: sinatra
+    group: sinatra
+    recurse: yes
+    state: directory
+  with_items:
+    - /var/tmp/{{ date.stdout }}
+    - /home/sinatra/shared
+
+- name: deploy current release
+  file:
+    src: /var/tmp/{{ date.stdout }}
+    dest: /home/sinatra/current
+    state: link
+    owner: sinatra
+    group: sinatra
+    mode: 0755
+
+- name: install bundler
+  command: chdir=/home/sinatra/current gem install bundler -v {{ bundler_version }} --no-document
+
+- name: create bundler config path
+  file:
+    path: /home/sinatra/current/.bundle
+    owner: sinatra
+    group: sinatra
+    mode: 0755
+    state: directory
+
+- name: configure bundler
+  template:
+    src: bundle/config
+    dest: /home/sinatra/current/.bundle/config
+    owner: sinatra
+    group: sinatra
+    mode: 0644
+
+- name: cache gems
+  become_user: sinatra
+  command: chdir=/home/sinatra/current bundle package --all
+
+- name: bundle install
+  become_user: sinatra
+  command: chdir=/home/sinatra/current bundle install --local --no-prune

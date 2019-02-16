@@ -1,0 +1,10 @@
+---
+BUNDLE_FROZEN: '1'
+BUNDLE_PATH: /home/sinatra/shared/vendor/bundle
+BUNDLE_JOBS: '{{ ansible_processor_count * 2 }}'
+BUNDLE_CLEAN: 'true'
+BUNDLE_WITHOUT: development:staging:test
+BUNDLE_DISABLE_SHARED_GEMS: '1'
+BUNDLE_CACHE_ALL: true
+BUNDLE_NO_PRUNE: true
+BUNDLE_GITHUB__HTTPS: true

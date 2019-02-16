@@ -1,0 +1,18 @@
+[Unit]
+Description=sinatra unicorn
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=3s
+User=sinatra
+Group=sinatra
+PIDFile=/home/sinatra/shared/pids/unicorn.pid
+WorkingDirectory=/home/sinatra/current
+ExecStart=/bin/bash -l -c "/usr/local/bin/bundle exec unicorn -c /home/sinatra/current/unicorn.conf.rb -E {{ env }}"
+ExecStop=/bin/kill -s QUIT $PIDFile
+ExecReload=/bin/kill -s HUP $PIDFile
+
+[Install]
+WantedBy=multi-user.target

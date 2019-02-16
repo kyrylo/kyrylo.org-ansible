@@ -1,10 +1,8 @@
 - hosts: web
   become: true
-  vars_files: ["{{ env }}/group_vars/all", "{{ env }}/group_vars/rails"]
+  vars_files: ["{{ env }}/group_vars/all"]
 
   roles:
-    - postgres
-    - nodejs
     - ruby
-    - rails
+    - sinatra
     - unicorn
