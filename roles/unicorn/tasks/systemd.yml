@@ -13,8 +13,8 @@
 
 - name: hot restart unicorn
   command: kill -s USR2 "{{ old_unicorn.stdout }}"
-  when: old_unicorn|success
+  when: old_unicorn is succeeded
 
 - name: start unicorns via systemd
   systemd: name=sinatra.service state=started enabled=yes
-  when: old_unicorn|failed
+  when: old_unicorn is failed
